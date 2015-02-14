@@ -1,0 +1,24 @@
+body { color: #314e58; background-color: #2B2B2B; font-family:微软雅黑,Verdana,Arial; font-size: 14px; }
+h1 { font-size: 25px; }
+div { box-sizing: border-box; }
+input { box-sizing: border-box; }
+
+.clear { clear: both; }
+.up { text-transform: uppercase; }
+.no-border { border: none !important; }
+.notice.success { color: green; }
+.notice.failure { color: red; }
+
+.btn { display: inline-block; text-decoration: none; padding: 10px 15px; }
+.btn-dark { background: #314E58; color: #fff; }
+
+.container { position: absolute; background-color:#EFF5EA; width: 600px; height: 500px; margin-left: -300px; margin-top: -250px; left: 50%; top: 50%; }
+.header{ width:100%; background-color: #314E58; color: #fff; padding: 20px 10px; margin-bottom: 10px; }
+
+.form-holder { padding: 20px 10px; border-bottom: 1px solid #314E58; width: 80%; margin: 0 auto; }
+.form-holder .entry { margin-bottom: 10px; }
+.form-holder .entry label { float: left; width: 100%; margin-bottom: 5px; }
+.form-holder .entry input { width: 100%; padding: 5px; }
+
+.input{border:1px solid #314E58;height: 25px;margin-left: 10px;}
+.notice,.csv_notice{font-weight:normal;font-size: 20px;}
