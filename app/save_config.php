@@ -14,14 +14,14 @@
         }else{
             $_result = array(
                 'success' => false,
-                'message' => "ApiUser and ApiKey cannot be empty.",
+                'message' => "ApiUser and ApiKey cannot be blank.",
             );
         }
        
     }else{
         $_result = array(
             'success' => false,
-            'message' => "Baseurl invalid.",
+            'message' => "Baseurl is invalid.",
         );
     }
     echo json_encode($_result);

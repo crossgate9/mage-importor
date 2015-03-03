@@ -9,11 +9,11 @@ input { box-sizing: border-box; }
 .notice.success { color: green; }
 .notice.failure { color: red; }
 
-.btn { display: inline-block; text-decoration: none; padding: 10px 15px; }
+.btn { display: inline-block; text-decoration: none; padding: 10px 15px;float:right; }
 .btn-dark { background: #314E58; color: #fff; }
 
-.container { position: absolute; background-color:#EFF5EA; width: 600px; height: 500px; margin-left: -300px; margin-top: -250px; left: 50%; top: 50%; }
-.header{ width:100%; background-color: #314E58; color: #fff; padding: 20px 10px; margin-bottom: 10px; }
+.container { position: absolute; box-shadow: 3px 3px 3px 3px #272822; border: 1px solid #314E58; background-color:#EFF5EA; width: 600px; height: 500px; margin-left: -300px; margin-top: -250px; left: 50%; top: 50%; }
+.header{ width:100%; background-color: #314E58; color: #fff; padding: 20px 10px; margin-bottom: 10px;}
 
 .form-holder { padding: 20px 10px; border-bottom: 1px solid #314E58; width: 80%; margin: 0 auto; }
 .form-holder .entry { margin-bottom: 10px; }
@@ -21,4 +21,4 @@ input { box-sizing: border-box; }
 .form-holder .entry input { width: 100%; padding: 5px; }
 
 .input{border:1px solid #314E58;height: 25px;margin-left: 10px;}
-.notice,.csv_notice{font-weight:normal;font-size: 20px;}
+.notice,.csv_notice{font-weight:normal;font-size: 16px;float: left;}

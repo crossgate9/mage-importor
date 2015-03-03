@@ -17,11 +17,11 @@
             <form id="form-config" action="./save_config.php" method="post">
             <div class="form-holder">
                 <div class="entry">
-                    <label>BaseUrl</label>
+                    <label>Base Url</label>
                     <input type="text" name="baseurl" class="text"/>
                 </div>
                 <div class="entry">
-                    <label>ApiUser</label>
+                    <label>Api User</label>
                     <input type="text" name="username" class="text"/>
                 </div>
                 <div class="entry">
@@ -30,13 +30,14 @@
                 </div>
                 <div class="clear"></div>
                 <div class="btn-set">
-                    <a href="#" class="btn btn-dark btn-submit up">Submit</a>
                     <div class="notice"></div>
+                    <a href="#" class="btn btn-dark btn-submit ">Submit</a>
+                    <div class="clear"></div>
                 </div>
             </div>
             </form>
             
-            <form action="import.php" method="post" id="file" enctype="multipart/form-data">
+            <form action="./import.php" method="post" id="form-csv" enctype="multipart/form-data">
             <div class="form-holder no-border">
                 <div class="entry">
                     <label>File Upload</label>
@@ -44,21 +45,12 @@
                 </div>
                 <div class="clear"></div>
                 <div class="btn-set">
-                    <a href="#" class="btn btn-dark btn-submit up">Import</a>
                     <div class="notice"></div>
+                    <a href="#" class="btn btn-dark btn-submit">Import</a>
+                    <div class="clear"></div>
                 </div>
             </div>
             </form>
         </div>
     </body>
 </html>
-<script type="text/javascript">
-    $("#file").submit(function(){
-        var msg = $(".notice").text();
-        if(msg!="Save Success."){
-            $(".csv_notice").css("color","red");
-            $(".csv_notice").html("Config information cannot be empty.");
-            return false;
-        }
-    });
-</script>

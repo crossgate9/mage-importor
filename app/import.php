@@ -1,6 +1,7 @@
 <?php
 	session_start();
 	set_time_limit(0);
+	ini_set('max_execution_time',18000);
 	require_once "getcsv.php";
 	require_once "stock_data.php";
 	require_once "tier_price.php";
@@ -13,7 +14,6 @@
 	$sessionId = $client->login($apiUser,$apiKey);
 	//获取csv文件的数据
 	$csv_datas = getcsv('csv_products');
-	var_dump($csv_datas);exit;
 	//获取magento属性集
 	$attributeSets = $client->call($sessionId,'product_attribute_set.list');
 	//拿到与上传数据对应属性集的id
@@ -58,38 +58,72 @@
 		//tier_price
 			$csv_data['tier_price'] = createTierPrice($csv_data);
 
+			//获取已有的产品信息,判断是创建还是更新
+			$products_info = $client->call($sessionId, 'catalog_product.list');
+			foreach($products_info as $products_info_key=> $product ){
+				$product_skus[$product['product_id']] = $product['sku'];
+			}
+			//判断是否是产品更新
+			if(in_array($csv_data['sku'],$product_skus)){
+				$product_sku_key = array_keys($product_skus,$csv_data['sku']);
+				$product_id = $product_sku_key['0'];
+				$result = $client->call($sessionId,'catalog_product.update', array($product_id,$csv_data) );
+			}else{
+				$result = $client->call($sessionId, 'catalog_product.create', array($csv_data['type'], $set['set_id'],$csv_data['sku'],$csv_data,$csv_data['store_id']));
+				
+				$images = array('image'=>$csv_data['image'],'small_image'=>$csv_data['small_image'],'thumbnail'=>$csv_data['thumbnail']);
 
-	 	$result = $client->call($sessionId, 'catalog_product.create', array($csv_data['type'], $set['set_id'],$csv_data['sku'],$csv_data,$csv_data['store_id']));
-
-		$images = array('image'=>$csv_data['image'],'small_image'=>$csv_data['small_image'],'thumbnail'=>$csv_data['thumbnail']);
-
-        //判断图片是否设置
-		foreach($images as $image_index => $image){
-			$label_index = $image_index."_label";
-			//判断是否设置label值
-				if(!isset($csv_data[$label_index])){
-	            	$csv_data[$label_index] = "";
-	            }
-	        //判断是否设置产品图片路径
-	            if($csv_data[$image_index]==""){
-	                $imagePath = $_SESSION['baseurl']."/skin/frontend/base/default/images/catalog/product/placeholder/".$image_index.".jpg";
-	            }else{
-	                $imagePath = $_SESSION['baseurl']."/media/import/".$image;
-	            }
-	        $newImage = array(
-	            'file' => array(
-	                'name' => getImageName($image),
-	                'content' => base64_encode(file_get_contents($imagePath)),
-	                'mime' => getMime($image)
-	            ),
-	            'label' => $csv_data[$label_index],
-	            'types' => array($image_index)
-	        );
-			//使用 Api创建产品图片
-			$imageFilename = $client->call($sessionId, 'product_media.create', array($result, $newImage));
-		}
-
+		        //判断图片是否设置
+				foreach($images as $image_index => $image){
+			        //判断是否设置产品图片路径
+			            if($csv_data[$image_index]==""){
+			                break;
+			            }else{
+			            	//判断是否有多张图片
+			            	if(strstr($image,";")===false){
+			            		$imagePath = $_SESSION['baseurl']."/media/import".$image;
+			            		$label_index = $image_index."_label";
+			            		if(!isset($csv_data[$label_index])){
+			            			$csv_data[$label_index] = "";
+					            }
+					        $newImage = array(
+					            'file' => array(
+					                'name' => getImageName($image),
+					                'content' => base64_encode(file_get_contents($imagePath)),
+					                'mime' => getMime($image)
+					            ),
+					            'label' => $csv_data[$label_index],
+					            'types' => array($image_index),
+					            'exclude' => 0
+					        );
+							//使用 Api创建产品图片
+							$imageFilename = $client->call($sessionId, 'product_media.create', array($result, $newImage));
+					        }else{//多张图片
+					        	$mult_images = explode(";", $image);
+						        	foreach($mult_images as $mult_img){
+					            		$imagePath = $_SESSION['baseurl']."/media/import".$mult_img;
+					            		$label_index = $image_index."_label";
+					            		if(!isset($csv_data[$label_index])){
+					            			$csv_data[$label_index] = "";
+							            }
+								        $newImage = array(
+								            'file' => array(
+								                'name' => getImageName($mult_img),
+								                'content' => base64_encode(file_get_contents($imagePath)),
+								                'mime' => getMime($mult_img)
+								            ),
+								            'label' => $csv_data[$label_index],
+								            'types' => array($image_index),
+								            'exclude' => 0
+								        );
+										//使用 Api创建产品图片
+									$imageFilename = $client->call($sessionId, 'product_media.create', array($result, $newImage));
+						        	}
+					        	}
+		         			}
+					}
+				}
 	}
-	echo "Products Uploaded Success.";
-	 session_destroy();
+	echo "Products Import Success!";
+	session_destroy();
 ?>

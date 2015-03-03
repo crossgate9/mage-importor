@@ -1,6 +1,5 @@
 (function($) {
   $(function() {
-
     var _ajax = function(url, data, callback, failure) {
       $.ajax({
         url: url,
@@ -40,9 +39,16 @@
       return false;
     });
 
-    $('#form-csv').on('click', function('.btn-submit'), function() {
-      return false;
-    });
-
+    $('#form-csv').on('click','.btn-submit', function() {
+      var $form = $('#form-csv');
+      if($("#form-config .btn-set").children('.success').text()=="") {
+        $("#form-csv .notice").addClass('failure');
+        $("#form-csv .notice").html('Config information is invalid.');
+        return false;
+      } else {
+            $form.submit();
+            $.fancybox.showLoading();
+          }
+    }).done(function(){$.fancybox.hideLoading();});
   });
 })(jQuery);
