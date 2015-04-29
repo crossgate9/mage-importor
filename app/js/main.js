@@ -49,6 +49,6 @@
             $form.submit();
             $.fancybox.showLoading();
           }
-    }).done(function(){$.fancybox.hideLoading();});
+    })
   });
 })(jQuery);

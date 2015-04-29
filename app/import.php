@@ -31,14 +31,19 @@
 			$attr_id_code[$attribute['attribute_id']]=$attribute['code'];
 		}
 	}
+
 	foreach($attr_id_code as $attr_id=>$attr_code){
 	 	//根据属性id拿到属性value和label
 	 	$results[] = $client->call($sessionId,"product_attribute.options",$attr_id);
+	 	//根据属性id拿到属性设置，判断是否为global和is_configurable
+	 	$attrs = $client->call($sessionId,"product_attribute.info",$attr_id);
+	 	if($attrs['scope']=='global'&&$attrs['is_configurable']=='1'&&$attrs['frontend_input']=='select'){
+	 		$config_attr[]=$attrs;
 	 	}
-
-	$attr= array_combine($attr_id_code,$results);
-	//将csv文件中select boolean 形式的label改为对应的value
-	foreach ($csv_datas as $csv_key => $csv_data) {
+	 }
+	 //将csv文件中select boolean 形式的label改为对应的value
+	 $attr= array_combine($attr_id_code,$results);
+	 foreach ($csv_datas as $csv_key => $csv_data) {
 	 		$websites = explode(",",$csv_data['websites']);
 			$csv_data['websites'] = $websites;
 			$categorys = explode(',',$csv_data['category_ids']);
@@ -57,9 +62,9 @@
 
 		//tier_price
 			$csv_data['tier_price'] = createTierPrice($csv_data);
-
 			//获取已有的产品信息,判断是创建还是更新
 			$products_info = $client->call($sessionId, 'catalog_product.list');
+			$product_skus = array();
 			foreach($products_info as $products_info_key=> $product ){
 				$product_skus[$product['product_id']] = $product['sku'];
 			}
@@ -69,8 +74,24 @@
 				$product_id = $product_sku_key['0'];
 				$result = $client->call($sessionId,'catalog_product.update', array($product_id,$csv_data) );
 			}else{
+				//判断是不是可配置产品
+				if($csv_data['type']=="configurable"){
+					//创建可配置产品的价格
+					foreach($config_attr as $attr_key =>$scope_attr){
+						$scope_attr_values = explode(';',$csv_data[$scope_attr['attribute_code']]);
+						foreach ($scope_attr_values as $key => $scope_attr_value) {
+							$scope_attr_value_arrays[] = explode(':', $scope_attr_value);
+						}
+						foreach($scope_attr_value_arrays as $k=> $scope_attr_value_array){
+							$scope_attr_value_result[$scope_attr_value_array['0']]= $scope_attr_value_array['1'];
+							}
+							$scope_attr_value_scope[$scope_attr['attribute_code']] = $scope_attr_value_result;
+					}
+					
+					$csv_data['price_changes'] = $scope_attr_value_scope;
+					$csv_data['associated_skus'] = explode(",",$csv_data['associated_skus']);
+				}
 				$result = $client->call($sessionId, 'catalog_product.create', array($csv_data['type'], $set['set_id'],$csv_data['sku'],$csv_data,$csv_data['store_id']));
-				
 				$images = array('image'=>$csv_data['image'],'small_image'=>$csv_data['small_image'],'thumbnail'=>$csv_data['thumbnail']);
 
 		        //判断图片是否设置

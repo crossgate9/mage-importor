@@ -1,6 +1,5 @@
 <?php
     session_start();
-    
     $_result = null;
     if(!empty($_POST['baseurl']) && preg_match('/^(http|https):\/\/[\w-_.]+(\/[\w-_]+)*/', $_POST['baseurl'])){
         if(!empty($_POST['username']) && !empty($_POST['key'])){
